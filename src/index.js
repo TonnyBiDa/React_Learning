@@ -190,15 +190,21 @@ var NameSearch = createReactClass({
 var ModifInfo = createReactClass({
 	getInitialState:function(){
 		return {
-			 ItemArr:[{Name: ''},{Gender:''},{Math:''},{Language:''}]
+			 ItemArr:[{Name: ''},{Gender:''},{Math:''},{Language:''}],
+			 row:[]
 		};
 	},
-	indexItems:function(){
-		// console.log(this.state.ItemArr);
-		// console.log(this.state.ItemArr[0].Name);
-		return(<ScoreItems updateItem = {this.state.ItemArr} />
-			);
-	},
+	// indexItems:function(){
+	// 	// console.log(this.state.ItemArr);
+	// 	// console.log(this.state.ItemArr[0].Name);
+	// 	console.log(this.state.ItemArr)
+	// 	if (this.state.ItemArr[0].Name === ''){
+	// 		console.log("emt")
+	// 	}else{
+	// 		// console.log("full")
+	// 	return(<ScoreItems updateItem = {this.state.ItemArr} />);
+	// 		}
+	// },
 	ItemSave:function(){
 		// ItemArr.push(this.inputName)
 		var arr=this.state.ItemArr
@@ -215,8 +221,19 @@ var ModifInfo = createReactClass({
 		// console.log(arr);
 		this.setState({ItemArr:arr});
 		// console.log(arr);
-		this.indexItems();
+		this.addrow();
 	},
+	addrow:function(){
+		// var arr=this.props.updateItems;
+		// console.log(arr);
+		var text=this.state.ItemArr;
+		console.log(text)
+		var addrow = this.state.row;
+		addrow.push(<ScoreTable key="pushItems" updateText = {text}/>);
+		this.setState({row:addrow});
+		// console.log(this.state)
+	},
+
 	render:function(){
 		return (<div className = "GenderSearch">
 					<text > Name: </text>
@@ -231,7 +248,22 @@ var ModifInfo = createReactClass({
 					<text > Language: </text>
 					<input ref="inputLanguage"></input>
 					<button className = "buttoner" onClick = {this.ItemSave}>Save</button>
-					<div>{this.indexItems()}</div>
+					
+					<table className = "table">
+					
+					  <tr>
+					    <th>Name</th>
+					    <th>Gender</th>
+					    <th>Math</th>
+					    <th>Language</th>
+					    <th>Operation</th>
+					  </tr>
+					  
+					  {this.state.row}
+					  
+					  
+					</table>
+					
 				</div>
 		);
 	}
@@ -241,57 +273,62 @@ var ModifInfo = createReactClass({
 var ScoreTable = createReactClass({
 	render:function(){
 		var text=this.props.updateText;
-		return (<div className = "GenderSearch">
+		console.log(text);
+		return (
 				<table className = "table">
 				  <tr>
-				    <th>Name</th>
-				    <th>Gender</th>
-				    <th>Math</th>
-				    <th>Language</th>
-				    <th>Operation</th>
-				  </tr>
-				  <tr>
-				    <th>{text[0].Name}</th>
-				    <th>{text[1].Gender}</th>
-				    <th>{text[2].Math}</th>
-				    <th>{text[3].Language}</th>
-				    <th><button>Remove</button></th>
+				    <td>{text[0].Name}</td>
+				    <td>{text[1].Gender}</td>
+				    <td>{text[2].Math}</td>
+				    <td>{text[3].Language}</td>
+				    <td><button>Remove</button></td>
 				  </tr>
 				</table>
-				</div>
+				
 		);
 	}
 
 });
 
-var ScoreItems = createReactClass({
-	// generateItem: function(){
+// var ScoreItems = createReactClass({
+// 	getInitialState:function(){
+// 		return{
+// 		row:[]
+// 		};
+// 	},
 
-	// },
-	render:function(){
-		// var arr=this.props.updateItems;
-		// console.log(arr);
-		var text=this.props.updateItem;
-		// console.log(text);
-		return(
-				<div>
-					<ScoreTable updateText={text}/>
-				</div>
-			);
-	}
-});
+// 	addrow:function(){
+// 		// var arr=this.props.updateItems;
+// 		// console.log(arr);
+// 		var text=this.props.updateItem;
+// 		console.log(text)
+// 		var addrow = this.state.row;
+// 		addrow.push(<ScoreTable updateText = {text}/>);
+// 		this.setState({row:addrow});
+// 		console.log(this.state)
+// 	},
 
- // var Board = createReactClass({
- // 	getInitialState:function(){
- // 		return {
- // 			var ItemArr[];
- // 		}
- // 	},
+// 	render:function(){
 
- // 	updateItem: function(){
+// 		return( <div className = "GenderSearch">
+// 				<table className = "table">
+// 				<tbody>
+// 				  <tr>
+// 				    <th>Name</th>
+// 				    <th>Gender</th>
+// 				    <th>Math</th>
+// 				    <th>Language</th>
+// 				    <th>Operation</th>
+// 				  </tr>
+// 				  {this.state.row}
+// 				  </tbody>
+// 				</table>
+// 				</div>
 
- // 	},
- // });
+// 		);
+// 	}
+
+//  });
 
 ReactDOM.render(
 				<div>
@@ -299,5 +336,5 @@ ReactDOM.render(
 				<NameSearch/>	
 				<ModifInfo/>
 				</div>
-				, document.getElementById('example'));
+				,document.getElementById('example'));
 registerServiceWorker();
