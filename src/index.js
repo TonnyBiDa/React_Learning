@@ -229,7 +229,7 @@ var ModifInfo = createReactClass({
 		var text=this.state.ItemArr;
 		console.log(text)
 		var addrow = this.state.row;
-		addrow.push(<ScoreTable key="pushItems" updateText = {text}/>);
+		addrow.push(<ScoreTable  updateText = {text}/>);
 		this.setState({row:addrow});
 		// console.log(this.state)
 	},
@@ -250,18 +250,19 @@ var ModifInfo = createReactClass({
 					<button className = "buttoner" onClick = {this.ItemSave}>Save</button>
 					
 					<table className = "table">
-					
+					<tbody>
 					  <tr>
 					    <th>Name</th>
 					    <th>Gender</th>
 					    <th>Math</th>
 					    <th>Language</th>
 					    <th>Operation</th>
+
 					  </tr>
 					  
 					  {this.state.row}
 					  
-					  
+					 </tbody>
 					</table>
 					
 				</div>
@@ -271,19 +272,22 @@ var ModifInfo = createReactClass({
 });
 
 var ScoreTable = createReactClass({
+	delete:function(){
+		this.refs.mytable.remove();
+	},
 	render:function(){
 		var text=this.props.updateText;
 		console.log(text);
 		return (
-				<table className = "table">
-				  <tr>
+				
+				  <tr ref ="mytable">
 				    <td>{text[0].Name}</td>
 				    <td>{text[1].Gender}</td>
 				    <td>{text[2].Math}</td>
 				    <td>{text[3].Language}</td>
-				    <td><button>Remove</button></td>
+				    <td><button onClick={this.delete}>Remove</button></td>
 				  </tr>
-				</table>
+				
 				
 		);
 	}
