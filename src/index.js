@@ -162,7 +162,7 @@ var createReactClass = require('create-react-class'); //----this is for handling
 //---------------------------------------------------
 //-------------Below is a litte projcect ------------
 //---------------------------------------------------
-
+var i=0;
 var GenderSearch = createReactClass({
 	render:function(){
 		return (<div className = "GenderSearch">
@@ -177,10 +177,18 @@ var GenderSearch = createReactClass({
 });
 
 var NameSearch = createReactClass({
+	getInitialState:function(){
+		return{
+			Search:[]
+		};
+	},
+	updachange:function(event){
+		this.setState({Search:event.target.value.substr(0,10)});
+	},
 	render:function(){
 		return (<div className = "GenderSearch">
 					<text > Name Search: </text>
-					<input ></input>
+					<input onChange = {this.updachange}></input>
 				</div>
 		);
 	}
@@ -190,8 +198,10 @@ var NameSearch = createReactClass({
 var ModifInfo = createReactClass({
 	getInitialState:function(){
 		return {
-			 ItemArr:[{Name: ''},{Gender:''},{Math:''},{Language:''}],
-			 row:[]
+			 ItemArr:{},
+			 row:[],
+			 addarr:[],
+			 
 		};
 	},
 	// indexItems:function(){
@@ -207,6 +217,7 @@ var ModifInfo = createReactClass({
 	// },
 	ItemSave:function(){
 		// ItemArr.push(this.inputName)
+		
 		var arr=this.state.ItemArr
 		var ItemName = this.refs.inputName.value;
 		var ItemGender = this.refs.optionValue.value;
@@ -214,24 +225,28 @@ var ModifInfo = createReactClass({
 		var ItemLanguage = this.refs.inputLanguage.value;
 		// console.log(i);
 		// console.log(arr.Name)
-		arr[0].Name=ItemName;
-		arr[1].Gender=ItemGender;
-		arr[2].Math=ItemMath;
-		arr[3].Language=ItemLanguage;
+		arr.Id=i;
+		arr.Name=ItemName;
+		arr.Gender=ItemGender;
+		arr.Math=ItemMath;
+		arr.Language=ItemLanguage;
 		// console.log(arr);
 		this.setState({ItemArr:arr});
 		// console.log(arr);
-		this.addrow();
-	},
-	addrow:function(){
+	
 		// var arr=this.props.updateItems;
 		// console.log(arr);
-		var text=this.state.ItemArr;
-		console.log(text)
+		// console.log(text)
 		var addrow = this.state.row;
-		addrow.push(<ScoreTable  updateText = {text}/>);
+		var sumarr = this.state.addarr;
+		// console.log(this.state.row);
+		sumarr.push(this.state.ItemArr);
+		this.setState({addarr:sumarr});
+		// console.log(this.state.addarr);
+		addrow.push(<ScoreTable  updateText = {this.state.addarr}/>);
 		this.setState({row:addrow});
-		// console.log(this.state)
+		
+		i++;
 	},
 
 	render:function(){
@@ -259,11 +274,11 @@ var ModifInfo = createReactClass({
 					    <th>Operation</th>
 
 					  </tr>
-					  
+					  </tbody>
+					</table>
 					  {this.state.row}
 					  
-					 </tbody>
-					</table>
+
 					
 				</div>
 		);
@@ -272,26 +287,58 @@ var ModifInfo = createReactClass({
 });
 
 var ScoreTable = createReactClass({
-	delete:function(){
-		this.refs.mytable.remove();
-	},
+	// getInitialState:function(){
+	// 	return{
+	// 		sum_arr:[]
+	// 	};
+	// },
+	// addarr:function(){
+	// 	var currarr=this.props.updateText;
+	// 	var arr=this.state.sum_arr;
+	// 	arr.push(currarr);
+	// 	this.setState({sum_arr:arr});
+	// 	// console.log(this.state);
+	// },
+	// delete:function(){
+	// 	this.refs.mytable.remove();
+	// },
 	render:function(){
 		var text=this.props.updateText;
 		console.log(text);
 		return (
 				
-				  <tr ref ="mytable">
-				    <td>{text[0].Name}</td>
-				    <td>{text[1].Gender}</td>
-				    <td>{text[2].Math}</td>
-				    <td>{text[3].Language}</td>
-				    <td><button onClick={this.delete}>Remove</button></td>
-				  </tr>
+				  <table className = "table">
+				    {text.map(function(data) {
+				    	return <Line contact={data}/>;
+				    }.bind(this))
+
+				}
+		
+				  </table>
 				
 				
 		);
 	}
 
+});
+
+var Line=createReactClass({
+	delete:function(){
+		this.refs.mytable.remove();
+	},
+	render:function(){
+		var rowline = this.props.contact;
+		// console.log(rowline);
+		return(
+				<tr ref="mytable" >
+				    <td>{rowline.Name}</td>
+				    <td>{rowline.Gender}</td>
+				    <td>{rowline.Math}</td>
+				    <td>{rowline.Language}</td>
+				    <td><button onClick={this.delete}>Remove</button></td>
+				</tr>
+			);
+	}
 });
 
 // var ScoreItems = createReactClass({
