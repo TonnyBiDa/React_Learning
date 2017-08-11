@@ -163,6 +163,25 @@ var createReactClass = require('create-react-class'); //----this is for handling
 //-------------Below is a litte projcect ------------
 //---------------------------------------------------
 var i=0;
+var StudentScoreTable = createReactClass({
+	getInitialState:function(){
+		return{NameFliter:''}
+	},
+	onNameChange:function(Name){
+		this.setState({NameFliter:Name});
+	},
+	render:function(){
+		return(
+				<div>
+				<GenderSearch/>
+				<NameSearch onNameChange={this.onNameChange}/>	
+				<ModifInfo nameFilter={this.state.NameFliter}/>
+				</div>
+			)
+	}
+})
+
+
 var GenderSearch = createReactClass({
 	render:function(){
 		return (<div className = "GenderSearch">
@@ -177,13 +196,12 @@ var GenderSearch = createReactClass({
 });
 
 var NameSearch = createReactClass({
-	getInitialState:function(){
-		return{
-			Search:[]
-		};
-	},
+
 	updachange:function(event){
-		this.setState({Search:event.target.value.substr(0,10)});
+		// this.setState({Search:event.target.value.substr(0,10)});
+		this.props.onNameChange(event.target.value.substr(0,10));
+		console.log(event.target.value);
+		// console.log(event.target.value);
 	},
 	render:function(){
 		return (<div className = "GenderSearch">
@@ -198,58 +216,43 @@ var NameSearch = createReactClass({
 var ModifInfo = createReactClass({
 	getInitialState:function(){
 		return {
-			 ItemArr:{},
-			 row:[],
 			 addarr:[],
 			 
 		};
 	},
-	// indexItems:function(){
-	// 	// console.log(this.state.ItemArr);
-	// 	// console.log(this.state.ItemArr[0].Name);
-	// 	console.log(this.state.ItemArr)
-	// 	if (this.state.ItemArr[0].Name === ''){
-	// 		console.log("emt")
-	// 	}else{
-	// 		// console.log("full")
-	// 	return(<ScoreItems updateItem = {this.state.ItemArr} />);
-	// 		}
-	// },
+
 	ItemSave:function(){
-		// ItemArr.push(this.inputName)
-		
-		var arr=this.state.ItemArr
+		var arr={};
 		var ItemName = this.refs.inputName.value;
 		var ItemGender = this.refs.optionValue.value;
 		var ItemMath = this.refs.inputMath.value;
 		var ItemLanguage = this.refs.inputLanguage.value;
-		// console.log(i);
-		// console.log(arr.Name)
+
 		arr.Id=i;
 		arr.Name=ItemName;
 		arr.Gender=ItemGender;
 		arr.Math=ItemMath;
 		arr.Language=ItemLanguage;
-		// console.log(arr);
-		this.setState({ItemArr:arr});
-		// console.log(arr);
-	
-		// var arr=this.props.updateItems;
-		// console.log(arr);
-		// console.log(text)
-		var addrow = this.state.row;
+
 		var sumarr = this.state.addarr;
-		// console.log(this.state.row);
-		sumarr.push(this.state.ItemArr);
+		sumarr.push(arr);
 		this.setState({addarr:sumarr});
-		// console.log(this.state.addarr);
-		addrow.push(<ScoreTable  updateText = {this.state.addarr}/>);
-		this.setState({row:addrow});
-		
+		console.log(this.state.addarr);
 		i++;
 	},
 
 	render:function(){
+		var scoreNotes=[];
+		var nameFilter=this.props.nameFilter;
+		this.state.addarr.map(function(scoreitems){
+			if(scoreitems.Name.indexOf(nameFilter)> -1){
+				scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>)
+				console.log("have word!")
+			}
+			if (nameFilter===''){
+			scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>)
+			}
+		});
 		return (<div className = "GenderSearch">
 					<text > Name: </text>
 					<input ref='inputName'></input>
@@ -265,7 +268,7 @@ var ModifInfo = createReactClass({
 					<button className = "buttoner" onClick = {this.ItemSave}>Save</button>
 					
 					<table className = "table">
-					<tbody>
+					<thead>
 					  <tr>
 					    <th>Name</th>
 					    <th>Gender</th>
@@ -274,11 +277,13 @@ var ModifInfo = createReactClass({
 					    <th>Operation</th>
 
 					  </tr>
-					  </tbody>
-					</table>
-					  {this.state.row}
+					  </thead>
+					  <tbody>
+					
+					  {scoreNotes}
 					  
-
+					  </tbody>
+					  </table>
 					
 				</div>
 		);
@@ -286,49 +291,16 @@ var ModifInfo = createReactClass({
 
 });
 
-var ScoreTable = createReactClass({
-	// getInitialState:function(){
-	// 	return{
-	// 		sum_arr:[]
-	// 	};
-	// },
-	// addarr:function(){
-	// 	var currarr=this.props.updateText;
-	// 	var arr=this.state.sum_arr;
-	// 	arr.push(currarr);
-	// 	this.setState({sum_arr:arr});
-	// 	// console.log(this.state);
-	// },
-	// delete:function(){
-	// 	this.refs.mytable.remove();
-	// },
-	render:function(){
-		var text=this.props.updateText;
-		console.log(text);
-		return (
-				
-				  <table className = "table">
-				    {text.map(function(data) {
-				    	return <Line contact={data}/>;
-				    }.bind(this))
 
-				}
-		
-				  </table>
-				
-				
-		);
-	}
-
-});
 
 var Line=createReactClass({
+	
 	delete:function(){
 		this.refs.mytable.remove();
 	},
+
 	render:function(){
-		var rowline = this.props.contact;
-		// console.log(rowline);
+		var rowline = this.props.score;
 		return(
 				<tr ref="mytable" >
 				    <td>{rowline.Name}</td>
@@ -341,51 +313,11 @@ var Line=createReactClass({
 	}
 });
 
-// var ScoreItems = createReactClass({
-// 	getInitialState:function(){
-// 		return{
-// 		row:[]
-// 		};
-// 	},
 
-// 	addrow:function(){
-// 		// var arr=this.props.updateItems;
-// 		// console.log(arr);
-// 		var text=this.props.updateItem;
-// 		console.log(text)
-// 		var addrow = this.state.row;
-// 		addrow.push(<ScoreTable updateText = {text}/>);
-// 		this.setState({row:addrow});
-// 		console.log(this.state)
-// 	},
-
-// 	render:function(){
-
-// 		return( <div className = "GenderSearch">
-// 				<table className = "table">
-// 				<tbody>
-// 				  <tr>
-// 				    <th>Name</th>
-// 				    <th>Gender</th>
-// 				    <th>Math</th>
-// 				    <th>Language</th>
-// 				    <th>Operation</th>
-// 				  </tr>
-// 				  {this.state.row}
-// 				  </tbody>
-// 				</table>
-// 				</div>
-
-// 		);
-// 	}
-
-//  });
 
 ReactDOM.render(
 				<div>
-				<GenderSearch/>
-				<NameSearch/>	
-				<ModifInfo/>
+				<StudentScoreTable/>
 				</div>
 				,document.getElementById('example'));
 registerServiceWorker();
