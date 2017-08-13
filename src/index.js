@@ -165,17 +165,23 @@ var createReactClass = require('create-react-class'); //----this is for handling
 var i=0;
 var StudentScoreTable = createReactClass({
 	getInitialState:function(){
-		return{NameFliter:''}
+		return{NameFliter:'',
+				GenderFliter: '0'
+				}
 	},
 	onNameChange:function(Name){
 		this.setState({NameFliter:Name});
 	},
+	onGenderChange:function(Gender){
+		this.setState({GenderFliter:Gender});
+		// console.log(this.state.GenderFliter);
+	},
 	render:function(){
 		return(
 				<div>
-				<GenderSearch/>
+				<GenderSearch onGenderChange = {this.onGenderChange}/>
 				<NameSearch onNameChange={this.onNameChange}/>	
-				<ModifInfo nameFilter={this.state.NameFliter}/>
+				<ModifInfo nameFilter={this.state.NameFliter} GenderFliter={this.state.GenderFliter}/>
 				</div>
 			)
 	}
@@ -183,11 +189,16 @@ var StudentScoreTable = createReactClass({
 
 
 var GenderSearch = createReactClass({
+	onFocus:function(event){
+		// console.log(event.target.value);
+		this.props.onGenderChange(event.target.value);
+	},
 	render:function(){
 		return (<div className = "GenderSearch">
 					<text> Gender Search: </text>
-					<select>
-						<option value = '1'>Man</option>
+					<select onChange={this.onFocus}>
+						<option value = '0' >All</option>
+						<option value = '1' >Man</option>
 						<option value = '2'>Famle</option>
 					</select>
 				</div>
@@ -244,15 +255,35 @@ var ModifInfo = createReactClass({
 	render:function(){
 		var scoreNotes=[];
 		var nameFilter=this.props.nameFilter;
+		var genderFilter=parseInt(this.props.GenderFliter);
+		console.log(genderFilter);
+		console.log(nameFilter);
+		 // if (genderFilter==='1'){console.log("ogogog")};
+		var GENDER=['All','Man','Famle'];
 		this.state.addarr.map(function(scoreitems){
+			// console.log(nameFilter);
+			if (nameFilter===''&& genderFilter===0){
+			console.log("fofofo");
+			scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+			}
+			if (nameFilter!=='' && genderFilter===0){
 			if(scoreitems.Name.indexOf(nameFilter)> -1){
-				scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>)
-				console.log("have word!")
+				scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+				}
 			}
-			if (nameFilter===''){
-			scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>)
+			if (nameFilter ==='' && genderFilter!==0){
+				if (GENDER[genderFilter]===scoreitems.Gender){
+					scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+				}
 			}
-		});
+			if (nameFilter!=='' && genderFilter!==''){
+				if (GENDER[genderFilter]===scoreitems.Gender && scoreitems.Name.indexOf(nameFilter)> -1){
+					scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} />);
+				}
+			}
+			}
+			
+		);
 		return (<div className = "GenderSearch">
 					<text > Name: </text>
 					<input ref='inputName'></input>
