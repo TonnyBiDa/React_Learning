@@ -166,7 +166,9 @@ var i=0;
 var StudentScoreTable = createReactClass({
 	getInitialState:function(){
 		return{NameFliter:'',
-				GenderFliter: '0'
+				GenderFliter: '0',
+				data:[],
+				deleteflag:false
 				}
 	},
 	onNameChange:function(Name){
@@ -176,12 +178,29 @@ var StudentScoreTable = createReactClass({
 		this.setState({GenderFliter:Gender});
 		// console.log(this.state.GenderFliter);
 	},
+	adddata:function(data){
+		this.setState({data:data});
+	},
+	// onDelete:function(DeleteFlag){
+	// 	var data = this.state.
+	// },
+	onDeletehander:function(id){
+		var deleteflag=this.setState.bind(this);
+		var data=this.state.data.map(function(item){
+			if (item.Id===id){
+				item.deleteflag=true;
+				deleteflag({deleteflag:true});
+			}
+			return item;
+		});
+	},
 	render:function(){
 		return(
 				<div>
 				<GenderSearch onGenderChange = {this.onGenderChange}/>
 				<NameSearch onNameChange={this.onNameChange}/>	
-				<ModifInfo nameFilter={this.state.NameFliter} GenderFliter={this.state.GenderFliter}/>
+				<ModifInfo nameFilter={this.state.NameFliter} GenderFliter={this.state.GenderFliter} data={this.state.data}
+				adddata={this.adddata} ondeletehander={this.onDeletehander} deleteflag={this.state.deleteflag}/>
 				</div>
 			)
 	}
@@ -225,13 +244,6 @@ var NameSearch = createReactClass({
 });
 
 var ModifInfo = createReactClass({
-	getInitialState:function(){
-		return {
-			 addarr:[],
-			 
-		};
-	},
-
 	ItemSave:function(){
 		var arr={};
 		var ItemName = this.refs.inputName.value;
@@ -244,41 +256,47 @@ var ModifInfo = createReactClass({
 		arr.Gender=ItemGender;
 		arr.Math=ItemMath;
 		arr.Language=ItemLanguage;
-
-		var sumarr = this.state.addarr;
+		arr.deleteflag=false;
+		// console.log(arr);
+		var sumarr = this.props.data;
 		sumarr.push(arr);
-		this.setState({addarr:sumarr});
-		console.log(this.state.addarr);
+		this.props.adddata(sumarr);
+		// console.log(this.state.addarr);
 		i++;
 	},
-
+	deletehander:function(id){
+		this.props.ondeletehander(id);
+	},
 	render:function(){
 		var scoreNotes=[];
 		var nameFilter=this.props.nameFilter;
 		var genderFilter=parseInt(this.props.GenderFliter);
-		console.log(genderFilter);
-		console.log(nameFilter);
+		// this.deletehander=this.deletehander.bind(this);
+		// console.log(genderFilter);
+		var deletehander=this.deletehander;
+		// console.log(this.props.data);
 		 // if (genderFilter==='1'){console.log("ogogog")};
 		var GENDER=['All','Man','Famle'];
-		this.state.addarr.map(function(scoreitems){
+		this.props.data.map(function(scoreitems){
 			// console.log(nameFilter);
+			// this.deletehander=this.deletehander.bind(this);
 			if (nameFilter===''&& genderFilter===0){
-			console.log("fofofo");
-			scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+			// console.log("fofofo");
+			!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
 			}
 			if (nameFilter!=='' && genderFilter===0){
 			if(scoreitems.Name.indexOf(nameFilter)> -1){
-				scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+				!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
 			if (nameFilter ==='' && genderFilter!==0){
 				if (GENDER[genderFilter]===scoreitems.Gender){
-					scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems}/>);
+					!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
 			if (nameFilter!=='' && genderFilter!==''){
 				if (GENDER[genderFilter]===scoreitems.Gender && scoreitems.Name.indexOf(nameFilter)> -1){
-					scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} />);
+					!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander} />);
 				}
 			}
 			}
@@ -327,7 +345,8 @@ var ModifInfo = createReactClass({
 var Line=createReactClass({
 	
 	delete:function(){
-		this.refs.mytable.remove();
+		// this.refs.mytable.remove();
+		this.props.ondelete(this.props.score.Id);
 	},
 
 	render:function(){
