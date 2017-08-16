@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 var createReactClass = require('create-react-class'); //----this is for handling react 15.6.1 component error
-
+var axios = require('axios');  //-----for read load api json
 //---------------------------------------------------
 //-------------Below is for practice Conponent ------
 //---------------------------------------------------
@@ -17,10 +17,10 @@ var createReactClass = require('create-react-class'); //----this is for handling
 // 		alert("here we go!")
 // 	},
 // 	render: function(){
-// 		return (<div className ="container">		
+// 		return (<div classCity ="container">		
 // 					<div>{this.props.children}</div>
-// 					<button onClick={this.edit}className ="buttoner">edit</button>
-// 					<button onClick={this.remove}className ="buttoner">remove</button>
+// 					<button onClick={this.edit}classCity ="buttoner">edit</button>
+// 					<button onClick={this.remove}classCity ="buttoner">remove</button>
 // 				</div>
 // 			);
 // 	}
@@ -88,7 +88,7 @@ var createReactClass = require('create-react-class'); //----this is for handling
 // 		return(
 // 		<div>
 // 		<textarea ref= "newText" defaultValue={this.props.children}></textarea>
-// 		<button className="buttoner" onClick={this.save}>save</button>
+// 		<button classCity="buttoner" onClick={this.save}>save</button>
 // 		</div>
 // 		);
 // 	},
@@ -96,8 +96,8 @@ var createReactClass = require('create-react-class'); //----this is for handling
 // 		return(
 // 		<div >
 // 			<p>{this.props.children}</p>
-// 			<button className="buttoner" onClick={this.remove}>remove</button>
-// 			<button className="buttoner" onClick={this.edit}>edit</button>
+// 			<button classCity="buttoner" onClick={this.remove}>remove</button>
+// 			<button classCity="buttoner" onClick={this.edit}>edit</button>
 // 		</div>
 // 		);
 // 	},
@@ -144,7 +144,7 @@ var createReactClass = require('create-react-class'); //----this is for handling
 
 // 	render:function(){
 // 		return(<div>
-// 				<button className="buttoner" onClick={this.add.bind(null,"Default text")}>ADD NEW COMMENT BOX</button>
+// 				<button classCity="buttoner" onClick={this.add.bind(null,"Default text")}>ADD NEW COMMENT BOX</button>
 // 				<div>
 // 					{
 // 						this.state.comments.map(this.indexcomments)
@@ -162,17 +162,67 @@ var createReactClass = require('create-react-class'); //----this is for handling
 //---------------------------------------------------
 //-------------Below is a litte projcect ------------
 //---------------------------------------------------
-var i=0;
+// var i=0;
+var http='http://api.apixu.com/v1/current.json?key='
+var apiKey='b83287318bb74860b7801352171508&q='
+
 var StudentScoreTable = createReactClass({
 	getInitialState:function(){
-		return{NameFliter:'',
+		return{CityFliter:'',
 				GenderFliter: '0',
 				data:[],
-				deleteflag:false
+				deleteflag:false,
+				Id:0
+				// condition:''
+				// weather:{}
 				}
 	},
-	onNameChange:function(Name){
-		this.setState({NameFliter:Name});
+	WeatherData:function(CityAsk){
+		var url=http+apiKey+CityAsk;
+		var weatheradd={};
+		// var condition='';
+		// console.log(i);
+		var State=this;
+		// var addd={};
+		var i=this.state.Id;
+		axios.get(url).then(function(items){
+			console.log(items);
+			
+			weatheradd.Id = i;
+			weatheradd.City = items.data.location.name;
+			weatheradd.Gender = 'Man';
+			// this.setState({condition:items.data.current.condition.text})
+			weatheradd.Condition = items.data.current.condition.text;
+			// State.setState({weather:response.data.location.name});
+			weatheradd.Temperature = items.data.current.temp_c;
+			weatheradd.Humidity = items.data.current.humidity;
+			weatheradd.WindDegree = items.data.current.wind_degree;
+			weatheradd.deleteflag=false;
+		});
+		// weatheradd.City=CityAsk;
+		// weatheradd.Gender = 'Man';
+		// weatheradd.Id = i;
+		// weatheradd.Condition = this.state.condition;
+		// data.push(weatheradd);
+		// console.log(this.state.weather);
+		// console.log(weatheradd.Temperature);
+		var data = this.state.data;
+		var i=this.state.Id;
+		
+		// console.log(i);
+		// addd.push[weatheradd];
+		// console.log(addd);
+		data.push(weatheradd);
+		console.log(weatheradd);
+		this.setState({data:data});
+		this.setState({Id:i});
+		i++;
+		// console.log(weather);
+		// console.log(weather);
+		// this.setState({data:CityAsk});
+	},
+	onCityChange:function(City){
+		this.setState({CityFliter:City});
 	},
 	onGenderChange:function(Gender){
 		this.setState({GenderFliter:Gender});
@@ -184,6 +234,11 @@ var StudentScoreTable = createReactClass({
 	// onDelete:function(DeleteFlag){
 	// 	var data = this.state.
 	// },
+	addId:function(){
+		var i=this.state.Id;
+		i++;
+		this.setState({Id:i});
+	},
 	onDeletehander:function(id){
 		var deleteflag=this.setState.bind(this);
 		var data=this.state.data.map(function(item){
@@ -197,15 +252,32 @@ var StudentScoreTable = createReactClass({
 	render:function(){
 		return(
 				<div>
+				<CityWeather GetWeatherData={this.WeatherData}/>
 				<GenderSearch onGenderChange = {this.onGenderChange}/>
-				<NameSearch onNameChange={this.onNameChange}/>	
-				<ModifInfo nameFilter={this.state.NameFliter} GenderFliter={this.state.GenderFliter} data={this.state.data}
-				adddata={this.adddata} ondeletehander={this.onDeletehander} deleteflag={this.state.deleteflag}/>
+				<CitySearch onCityChange={this.onCityChange}/>	
+				<ModifInfo CityFilter={this.state.CityFliter} GenderFliter={this.state.GenderFliter} data={this.state.data}
+				adddata={this.adddata} ondeletehander={this.onDeletehander} deleteflag={this.state.deleteflag} Id={this.state.Id}
+				addId={this.addId}/>
 				</div>
 			)
 	}
 })
 
+var CityWeather=createReactClass({
+	GetData:function(){
+		this.props.GetWeatherData(this.refs.CityAsk.value);
+	},
+	render:function(){
+		return(
+				<div className="GenderSearch">
+				<text > City: </text>
+				<input ref='CityAsk'></input>
+				<button className = "buttoner" onClick={this.GetData}>Submit</button>
+				</div>
+
+			)
+	}
+})
 
 var GenderSearch = createReactClass({
 	onFocus:function(event){
@@ -225,17 +297,17 @@ var GenderSearch = createReactClass({
 	}
 });
 
-var NameSearch = createReactClass({
+var CitySearch = createReactClass({
 
 	updachange:function(event){
 		// this.setState({Search:event.target.value.substr(0,10)});
-		this.props.onNameChange(event.target.value.substr(0,10));
-		console.log(event.target.value);
+		this.props.onCityChange(event.target.value.substr(0,10));
+		// console.log(event.target.value);
 		// console.log(event.target.value);
 	},
 	render:function(){
 		return (<div className = "GenderSearch">
-					<text > Name Search: </text>
+					<text > City Search: </text>
 					<input onChange = {this.updachange}></input>
 				</div>
 		);
@@ -246,30 +318,35 @@ var NameSearch = createReactClass({
 var ModifInfo = createReactClass({
 	ItemSave:function(){
 		var arr={};
-		var ItemName = this.refs.inputName.value;
+		var ItemCity = this.refs.inputCity.value;
 		var ItemGender = this.refs.optionValue.value;
-		var ItemMath = this.refs.inputMath.value;
-		var ItemLanguage = this.refs.inputLanguage.value;
+		var ItemCondition = this.refs.inputCondition.value;
+		var ItemTemperature = this.refs.inputTemperature.value;
+		var ItemHumidity = this.refs.inputHumidity.value;
+		var ItemWindDegree = this.refs.inputWindDegree.value;
 
-		arr.Id=i;
-		arr.Name=ItemName;
+		arr.Id=this.props.Id;
+		arr.City=ItemCity;
 		arr.Gender=ItemGender;
-		arr.Math=ItemMath;
-		arr.Language=ItemLanguage;
+		arr.Condition=ItemCondition;
+		arr.Temperature=ItemTemperature;
+		arr.Humidity=ItemHumidity;
+		arr.WindDegree=ItemWindDegree;
 		arr.deleteflag=false;
 		// console.log(arr);
 		var sumarr = this.props.data;
 		sumarr.push(arr);
 		this.props.adddata(sumarr);
+		this.props.addId();
 		// console.log(this.state.addarr);
-		i++;
+		// i++;
 	},
 	deletehander:function(id){
 		this.props.ondeletehander(id);
 	},
 	render:function(){
 		var scoreNotes=[];
-		var nameFilter=this.props.nameFilter;
+		var CityFilter=this.props.CityFilter;
 		var genderFilter=parseInt(this.props.GenderFliter);
 		// this.deletehander=this.deletehander.bind(this);
 		// console.log(genderFilter);
@@ -277,52 +354,60 @@ var ModifInfo = createReactClass({
 		// console.log(this.props.data);
 		 // if (genderFilter==='1'){console.log("ogogog")};
 		var GENDER=['All','Man','Famle'];
-		this.props.data.map(function(scoreitems){
-			// console.log(nameFilter);
+		// console.log(this.props.data);
+		this.props.data.map(function(scoreitems,i){
+			// console.log(CityFilter);
 			// this.deletehander=this.deletehander.bind(this);
-			if (nameFilter===''&& genderFilter===0){
+			if (CityFilter===''&& genderFilter===0){
 			// console.log("fofofo");
-			!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
+			// console.log(scoreitems);
+			!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 			}
-			if (nameFilter!=='' && genderFilter===0){
-			if(scoreitems.Name.indexOf(nameFilter)> -1){
-				!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
+			if (CityFilter!=='' && genderFilter===0){
+			if(scoreitems.City.indexOf(CityFilter)> -1){
+				!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
-			if (nameFilter ==='' && genderFilter!==0){
+			if (CityFilter ==='' && genderFilter!==0){
 				if (GENDER[genderFilter]===scoreitems.Gender){
-					!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander}/>);
+					!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
-			if (nameFilter!=='' && genderFilter!==''){
-				if (GENDER[genderFilter]===scoreitems.Gender && scoreitems.Name.indexOf(nameFilter)> -1){
-					!scoreitems.deleteflag&&scoreNotes.push(<Line key={scoreitems.Id} score={scoreitems} ondelete={deletehander} />);
+			if (CityFilter!=='' && genderFilter!==''){
+				if (GENDER[genderFilter]===scoreitems.Gender && scoreitems.City.indexOf(CityFilter)> -1){
+					!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander} />);
 				}
 			}
 			}
 			
 		);
 		return (<div className = "GenderSearch">
-					<text > Name: </text>
-					<input ref='inputName'></input>
+					<text > City: </text>
+					<input ref='inputCity'></input>
 					<text > Gender: </text>
 					<select ref = 'optionValue'>
 						<option  value = 'Man'>Man</option>
 						<option  value = 'Famle'>Famle</option>
 					</select>
-					<text > Math: </text>
-					<input ref='inputMath'></input>
-					<text > Language: </text>
-					<input ref="inputLanguage"></input>
+					<text > Condition: </text>
+					<input ref='inputCondition'></input>
+					<text > Temperature: </text>
+					<input ref="inputTemperature"></input>
+					<text > Humidity: </text>
+					<input ref="inputHumidity"></input>
+					<text > Wind Degree: </text>
+					<input ref="inputWindDegree"></input>
 					<button className = "buttoner" onClick = {this.ItemSave}>Save</button>
 					
 					<table className = "table">
 					<thead>
 					  <tr>
-					    <th>Name</th>
+					    <th>City</th>
 					    <th>Gender</th>
-					    <th>Math</th>
-					    <th>Language</th>
+					    <th>Condition</th>
+					    <th>Temperature</th>
+					    <th>Humidity</th>
+					    <th>Wind Degree</th>
 					    <th>Operation</th>
 
 					  </tr>
@@ -351,12 +436,16 @@ var Line=createReactClass({
 
 	render:function(){
 		var rowline = this.props.score;
+		// console.log(rowline);
+		// console.log(rowline.City);
 		return(
 				<tr ref="mytable" >
-				    <td>{rowline.Name}</td>
+				    <td>{rowline.City}</td>
 				    <td>{rowline.Gender}</td>
-				    <td>{rowline.Math}</td>
-				    <td>{rowline.Language}</td>
+				    <td>{rowline.Condition}</td>
+				    <td>{rowline.Temperature}</td>
+				    <td>{rowline.Humidity}</td>
+				    <td>{rowline.WindDegree}</td>
 				    <td><button onClick={this.delete}>Remove</button></td>
 				</tr>
 			);
