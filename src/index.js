@@ -169,7 +169,7 @@ var apiKey='b83287318bb74860b7801352171508&q='
 var StudentScoreTable = createReactClass({
 	getInitialState:function(){
 		return{CityFliter:'',
-				GenderFliter: '0',
+				EvaluationFliter: '0',
 				data:[],
 				deleteflag:false,
 				Id:0
@@ -177,7 +177,12 @@ var StudentScoreTable = createReactClass({
 				// weather:{}
 				}
 	},
-	WeatherData:function(CityAsk){
+	componentWillMount(){
+		this.WeatherData();
+	},
+	WeatherData:function(CityAsk=''){
+		console.log(CityAsk);
+		if (CityAsk!==''){
 		var url=http+apiKey+CityAsk;
 		var weatheradd={};
 		// var condition='';
@@ -185,12 +190,14 @@ var StudentScoreTable = createReactClass({
 		var State=this;
 		// var addd={};
 		var i=this.state.Id;
+		var data = this.state.data;
+		// var i=this.state.Id;
 		axios.get(url).then(function(items){
-			console.log(items);
+			// console.log(items);
 			
 			weatheradd.Id = i;
 			weatheradd.City = items.data.location.name;
-			weatheradd.Gender = 'Man';
+			weatheradd.Evaluation = 'Go outside!';
 			// this.setState({condition:items.data.current.condition.text})
 			weatheradd.Condition = items.data.current.condition.text;
 			// State.setState({weather:response.data.location.name});
@@ -198,25 +205,25 @@ var StudentScoreTable = createReactClass({
 			weatheradd.Humidity = items.data.current.humidity;
 			weatheradd.WindDegree = items.data.current.wind_degree;
 			weatheradd.deleteflag=false;
-		});
+			data.push(weatheradd);
+			State.setState({data:data});
+			i++;
+			State.setState({Id:i});
+			
+		});}else{return }
 		// weatheradd.City=CityAsk;
-		// weatheradd.Gender = 'Man';
+		// weatheradd.Evaluation = 'Go outside!';
 		// weatheradd.Id = i;
 		// weatheradd.Condition = this.state.condition;
 		// data.push(weatheradd);
 		// console.log(this.state.weather);
 		// console.log(weatheradd.Temperature);
-		var data = this.state.data;
-		var i=this.state.Id;
+
 		
 		// console.log(i);
 		// addd.push[weatheradd];
 		// console.log(addd);
-		data.push(weatheradd);
-		console.log(weatheradd);
-		this.setState({data:data});
-		this.setState({Id:i});
-		i++;
+
 		// console.log(weather);
 		// console.log(weather);
 		// this.setState({data:CityAsk});
@@ -224,9 +231,9 @@ var StudentScoreTable = createReactClass({
 	onCityChange:function(City){
 		this.setState({CityFliter:City});
 	},
-	onGenderChange:function(Gender){
-		this.setState({GenderFliter:Gender});
-		// console.log(this.state.GenderFliter);
+	onEvaluationChange:function(Evaluation){
+		this.setState({EvaluationFliter:Evaluation});
+		// console.log(this.state.EvaluationFliter);
 	},
 	adddata:function(data){
 		this.setState({data:data});
@@ -238,6 +245,9 @@ var StudentScoreTable = createReactClass({
 		var i=this.state.Id;
 		i++;
 		this.setState({Id:i});
+	},
+	WeatherDataadd:function(CityAsk){
+		this.WeatherData(CityAsk);
 	},
 	onDeletehander:function(id){
 		var deleteflag=this.setState.bind(this);
@@ -252,10 +262,10 @@ var StudentScoreTable = createReactClass({
 	render:function(){
 		return(
 				<div>
-				<CityWeather GetWeatherData={this.WeatherData}/>
-				<GenderSearch onGenderChange = {this.onGenderChange}/>
+				<CityWeather GetWeatherData={this.WeatherDataadd}/>
+				<EvaluationSearch onEvaluationChange = {this.onEvaluationChange}/>
 				<CitySearch onCityChange={this.onCityChange}/>	
-				<ModifInfo CityFilter={this.state.CityFliter} GenderFliter={this.state.GenderFliter} data={this.state.data}
+				<ModifInfo CityFilter={this.state.CityFliter} EvaluationFliter={this.state.EvaluationFliter} data={this.state.data}
 				adddata={this.adddata} ondeletehander={this.onDeletehander} deleteflag={this.state.deleteflag} Id={this.state.Id}
 				addId={this.addId}/>
 				</div>
@@ -266,12 +276,13 @@ var StudentScoreTable = createReactClass({
 var CityWeather=createReactClass({
 	GetData:function(){
 		this.props.GetWeatherData(this.refs.CityAsk.value);
+		this.refs.CityAsk.value='';
 	},
 	render:function(){
 		return(
-				<div className="GenderSearch">
+				<div className="EvaluationSearch">
 				<text > City: </text>
-				<input ref='CityAsk'></input>
+				<input ref='CityAsk' ></input>
 				<button className = "buttoner" onClick={this.GetData}>Submit</button>
 				</div>
 
@@ -279,18 +290,18 @@ var CityWeather=createReactClass({
 	}
 })
 
-var GenderSearch = createReactClass({
+var EvaluationSearch = createReactClass({
 	onFocus:function(event){
 		// console.log(event.target.value);
-		this.props.onGenderChange(event.target.value);
+		this.props.onEvaluationChange(event.target.value);
 	},
 	render:function(){
-		return (<div className = "GenderSearch">
-					<text> Gender Search: </text>
+		return (<div className = "EvaluationSearch">
+					<text> Evaluation Search: </text>
 					<select onChange={this.onFocus}>
 						<option value = '0' >All</option>
-						<option value = '1' >Man</option>
-						<option value = '2'>Famle</option>
+						<option value = '1' >Go outside!</option>
+						<option value = '2'>Stay at home</option>
 					</select>
 				</div>
 			);
@@ -306,7 +317,7 @@ var CitySearch = createReactClass({
 		// console.log(event.target.value);
 	},
 	render:function(){
-		return (<div className = "GenderSearch">
+		return (<div className = "EvaluationSearch">
 					<text > City Search: </text>
 					<input onChange = {this.updachange}></input>
 				</div>
@@ -319,15 +330,21 @@ var ModifInfo = createReactClass({
 	ItemSave:function(){
 		var arr={};
 		var ItemCity = this.refs.inputCity.value;
-		var ItemGender = this.refs.optionValue.value;
+		var ItemEvaluation = this.refs.optionValue.value;
 		var ItemCondition = this.refs.inputCondition.value;
 		var ItemTemperature = this.refs.inputTemperature.value;
 		var ItemHumidity = this.refs.inputHumidity.value;
 		var ItemWindDegree = this.refs.inputWindDegree.value;
 
+		this.refs.inputCity.value ='';
+		this.refs.inputCondition.value ='';
+		this.refs.inputTemperature.value ='';
+		this.refs.inputHumidity.value ='';
+		this.refs.inputWindDegree.value ='';
+
 		arr.Id=this.props.Id;
 		arr.City=ItemCity;
-		arr.Gender=ItemGender;
+		arr.Evaluation=ItemEvaluation;
 		arr.Condition=ItemCondition;
 		arr.Temperature=ItemTemperature;
 		arr.Humidity=ItemHumidity;
@@ -347,47 +364,47 @@ var ModifInfo = createReactClass({
 	render:function(){
 		var scoreNotes=[];
 		var CityFilter=this.props.CityFilter;
-		var genderFilter=parseInt(this.props.GenderFliter);
+		var EvaluationFilter=parseInt(this.props.EvaluationFliter);
 		// this.deletehander=this.deletehander.bind(this);
-		// console.log(genderFilter);
+		// console.log(EvaluationFilter);
 		var deletehander=this.deletehander;
 		// console.log(this.props.data);
-		 // if (genderFilter==='1'){console.log("ogogog")};
-		var GENDER=['All','Man','Famle'];
+		 // if (EvaluationFilter==='1'){console.log("ogogog")};
+		var Evaluation=['All','Go outside!','Stay at home'];
 		// console.log(this.props.data);
 		this.props.data.map(function(scoreitems,i){
 			// console.log(CityFilter);
 			// this.deletehander=this.deletehander.bind(this);
-			if (CityFilter===''&& genderFilter===0){
+			if (CityFilter===''&& EvaluationFilter===0){
 			// console.log("fofofo");
 			// console.log(scoreitems);
 			!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 			}
-			if (CityFilter!=='' && genderFilter===0){
+			if (CityFilter!=='' && EvaluationFilter===0){
 			if(scoreitems.City.indexOf(CityFilter)> -1){
 				!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
-			if (CityFilter ==='' && genderFilter!==0){
-				if (GENDER[genderFilter]===scoreitems.Gender){
+			if (CityFilter ==='' && EvaluationFilter!==0){
+				if (Evaluation[EvaluationFilter]===scoreitems.Evaluation){
 					!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander}/>);
 				}
 			}
-			if (CityFilter!=='' && genderFilter!==''){
-				if (GENDER[genderFilter]===scoreitems.Gender && scoreitems.City.indexOf(CityFilter)> -1){
+			if (CityFilter!=='' && EvaluationFilter!==''){
+				if (Evaluation[EvaluationFilter]===scoreitems.Evaluation && scoreitems.City.indexOf(CityFilter)> -1){
 					!scoreitems.deleteflag&&scoreNotes.push(<Line key={i} score={scoreitems} ondelete={deletehander} />);
 				}
 			}
 			}
 			
 		);
-		return (<div className = "GenderSearch">
+		return (<div className = "EvaluationSearch">
 					<text > City: </text>
 					<input ref='inputCity'></input>
-					<text > Gender: </text>
+					<text > Evaluation: </text>
 					<select ref = 'optionValue'>
-						<option  value = 'Man'>Man</option>
-						<option  value = 'Famle'>Famle</option>
+						<option  value = 'Go outside!'>Go outside!</option>
+						<option  value = 'Stay at home'>Stay at home</option>
 					</select>
 					<text > Condition: </text>
 					<input ref='inputCondition'></input>
@@ -403,7 +420,7 @@ var ModifInfo = createReactClass({
 					<thead>
 					  <tr>
 					    <th>City</th>
-					    <th>Gender</th>
+					    <th>Evaluation</th>
 					    <th>Condition</th>
 					    <th>Temperature</th>
 					    <th>Humidity</th>
@@ -441,7 +458,7 @@ var Line=createReactClass({
 		return(
 				<tr ref="mytable" >
 				    <td>{rowline.City}</td>
-				    <td>{rowline.Gender}</td>
+				    <td>{rowline.Evaluation}</td>
 				    <td>{rowline.Condition}</td>
 				    <td>{rowline.Temperature}</td>
 				    <td>{rowline.Humidity}</td>

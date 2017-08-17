@@ -17,9 +17,12 @@ body {
  	color: black;
  }
 
- .GenderSearch {
+ .EvaluationSearch {
  	padding: 15px;
  }
+input{
+  width: 100px;
+}
 table.table {  
     font-family: verdana,arial,sans-serif;  
     font-size:11px;  
