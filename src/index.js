@@ -162,103 +162,85 @@ var axios = require('axios');  //-----for read load api json
 //---------------------------------------------------
 //-------------Below is a litte projcect ------------
 //---------------------------------------------------
-// var i=0;
+
 var http='http://api.apixu.com/v1/current.json?key='
-var apiKey='b83287318bb74860b7801352171508&q='
+var apiKey='b83287318bb74860b7801352171508&q='        //the key only allow 500 visit per month
 
 var StudentScoreTable = createReactClass({
+
 	getInitialState:function(){
 		return{CityFliter:'',
 				EvaluationFliter: '0',
 				data:[],
 				deleteflag:false,
 				Id:0
-				// condition:''
-				// weather:{}
 				}
 	},
-	componentWillMount(){
+
+	componentWillMount(){       //must use componentWillMount cuz the weatherData will not get into data{}
 		this.WeatherData();
+	
 	},
+
 	WeatherData:function(CityAsk=''){
-		console.log(CityAsk);
 		if (CityAsk!==''){
 		var url=http+apiKey+CityAsk;
 		var weatheradd={};
-		// var condition='';
-		// console.log(i);
-		var State=this;
-		// var addd={};
+
 		var i=this.state.Id;
 		var data = this.state.data;
-		// var i=this.state.Id;
+		var State=this;
+
 		axios.get(url).then(function(items){
-			// console.log(items);
-			
+			// console.log(items);		
 			weatheradd.Id = i;
 			weatheradd.City = items.data.location.name;
 			weatheradd.Evaluation = 'Go outside!';
-			// this.setState({condition:items.data.current.condition.text})
 			weatheradd.Condition = items.data.current.condition.text;
-			// State.setState({weather:response.data.location.name});
 			weatheradd.Temperature = items.data.current.temp_c;
 			weatheradd.Humidity = items.data.current.humidity;
 			weatheradd.WindDegree = items.data.current.wind_degree;
 			weatheradd.deleteflag=false;
 			data.push(weatheradd);
-			State.setState({data:data});
+			State.setState({data:data});     //setState need inside get()
 			i++;
 			State.setState({Id:i});
 			
-		});}else{return }
-		// weatheradd.City=CityAsk;
-		// weatheradd.Evaluation = 'Go outside!';
-		// weatheradd.Id = i;
-		// weatheradd.Condition = this.state.condition;
-		// data.push(weatheradd);
-		// console.log(this.state.weather);
-		// console.log(weatheradd.Temperature);
+		});}else{return}
 
-		
-		// console.log(i);
-		// addd.push[weatheradd];
-		// console.log(addd);
-
-		// console.log(weather);
-		// console.log(weather);
-		// this.setState({data:CityAsk});
 	},
+
 	onCityChange:function(City){
 		this.setState({CityFliter:City});
 	},
+
 	onEvaluationChange:function(Evaluation){
 		this.setState({EvaluationFliter:Evaluation});
-		// console.log(this.state.EvaluationFliter);
+
 	},
-	adddata:function(data){
-		this.setState({data:data});
-	},
-	// onDelete:function(DeleteFlag){
-	// 	var data = this.state.
-	// },
-	addId:function(){
-		var i=this.state.Id;
-		i++;
-		this.setState({Id:i});
-	},
+
 	WeatherDataadd:function(CityAsk){
 		this.WeatherData(CityAsk);
 	},
+
 	onDeletehander:function(id){
 		var deleteflag=this.setState.bind(this);
 		var data=this.state.data.map(function(item){
 			if (item.Id===id){
 				item.deleteflag=true;
-				deleteflag({deleteflag:true});
+				deleteflag({deleteflag:true});       //make sure delete the same id
 			}
 			return item;
 		});
 	},
+	adddata:function(data){
+		this.setState({data:data});
+	},
+
+	addId:function(id){
+		this.setState({Id:id});
+	},
+	
 	render:function(){
 		return(
 				<div>
@@ -274,10 +256,12 @@ var StudentScoreTable = createReactClass({
 })
 
 var CityWeather=createReactClass({
+
 	GetData:function(){
 		this.props.GetWeatherData(this.refs.CityAsk.value);
 		this.refs.CityAsk.value='';
 	},
+
 	render:function(){
 		return(
 				<div className="EvaluationSearch">
@@ -291,10 +275,11 @@ var CityWeather=createReactClass({
 })
 
 var EvaluationSearch = createReactClass({
+
 	onFocus:function(event){
-		// console.log(event.target.value);
 		this.props.onEvaluationChange(event.target.value);
 	},
+
 	render:function(){
 		return (<div className = "EvaluationSearch">
 					<text> Evaluation Search: </text>
@@ -311,11 +296,9 @@ var EvaluationSearch = createReactClass({
 var CitySearch = createReactClass({
 
 	updachange:function(event){
-		// this.setState({Search:event.target.value.substr(0,10)});
 		this.props.onCityChange(event.target.value.substr(0,10));
-		// console.log(event.target.value);
-		// console.log(event.target.value);
 	},
+
 	render:function(){
 		return (<div className = "EvaluationSearch">
 					<text > City Search: </text>
@@ -350,31 +333,27 @@ var ModifInfo = createReactClass({
 		arr.Humidity=ItemHumidity;
 		arr.WindDegree=ItemWindDegree;
 		arr.deleteflag=false;
-		// console.log(arr);
+
 		var sumarr = this.props.data;
 		sumarr.push(arr);
 		this.props.adddata(sumarr);
 		this.props.addId();
-		// console.log(this.state.addarr);
-		// i++;
 	},
+
 	deletehander:function(id){
 		this.props.ondeletehander(id);
 	},
+
 	render:function(){
+
 		var scoreNotes=[];
 		var CityFilter=this.props.CityFilter;
 		var EvaluationFilter=parseInt(this.props.EvaluationFliter);
-		// this.deletehander=this.deletehander.bind(this);
-		// console.log(EvaluationFilter);
 		var deletehander=this.deletehander;
-		// console.log(this.props.data);
-		 // if (EvaluationFilter==='1'){console.log("ogogog")};
 		var Evaluation=['All','Go outside!','Stay at home'];
-		// console.log(this.props.data);
+
 		this.props.data.map(function(scoreitems,i){
-			// console.log(CityFilter);
-			// this.deletehander=this.deletehander.bind(this);
+
 			if (CityFilter===''&& EvaluationFilter===0){
 			// console.log("fofofo");
 			// console.log(scoreitems);
@@ -398,6 +377,7 @@ var ModifInfo = createReactClass({
 			}
 			
 		);
+
 		return (<div className = "EvaluationSearch">
 					<text > City: </text>
 					<input ref='inputCity'></input>
@@ -429,7 +409,7 @@ var ModifInfo = createReactClass({
 
 					  </tr>
 					  </thead>
-					  <tbody>
+					  <tbody>      
 					
 					  {scoreNotes}
 					  
@@ -447,14 +427,13 @@ var ModifInfo = createReactClass({
 var Line=createReactClass({
 	
 	delete:function(){
-		// this.refs.mytable.remove();
+		// this.refs.mytable.remove();            //At first I try to use remove() to delete conponent but worse
 		this.props.ondelete(this.props.score.Id);
 	},
 
 	render:function(){
 		var rowline = this.props.score;
-		// console.log(rowline);
-		// console.log(rowline.City);
+
 		return(
 				<tr ref="mytable" >
 				    <td>{rowline.City}</td>
